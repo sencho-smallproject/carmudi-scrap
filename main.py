@@ -33,6 +33,11 @@ def scrap(page):
 
     # scraping
     for i in mainsoup:
+        # akses link
+        links = i.find('a', 'ellipsize js-ellipsize-text')['href']
+        reqtwo = requests.get(links)
+        souptwo = BeautifulSoup(reqtwo.text, 'html.parser')
+
         title = i.find('a', 'ellipsize js-ellipsize-text').text.strip().replace('/', '')
 
         # menghindari error untuk iklan yang tidak memiliki harga
@@ -47,11 +52,15 @@ def scrap(page):
         except Exception:
             pass
 
-        desc = i.find('div', 'listing__excerpt milli text--muted push-quarter--ends').text.replace('...', ' read more').strip()
+        # menghindari error untuk deskripsi yang tidak tersedia
+        try:
+            desc = souptwo.find('span', {'itemprop': 'description'}).text.replace('\n', ' ').replace('Tawaran Terbaik dari Carmudi.co.id ', '')
+        except Exception:
+            pass
+
         km = i.find('i', 'icon icon--secondary muted valign--top push-quarter--right icon--meter').next_sibling
         trans = i.find('i', 'icon icon--secondary muted valign--top push-quarter--right icon--transmission').next_sibling
         loc = i.find('i', 'icon icon--secondary muted valign--top push-quarter--right icon--location').next_sibling
-        links = i.find('a', 'ellipsize js-ellipsize-text')['href']
         datt = {
             'title': title,
             'price': price,
@@ -102,28 +111,30 @@ def run():
             return run()
 
     elif option == 2:
-        for j in range(1, 71):
+        for j in range(1, 101):
             scrap(j)
         try:
             os.mkdir('resultfile/file/alldatafile')
         except FileExistsError:
             pass
 
+        # read json file for merge
         filesjson = sorted(glob.glob('resultfile/file/json/*.json'))
         datas = []
         for i in filesjson:
             with open(i) as jsonfile:
                 data = json.load(jsonfile)
-                datas.append(data)
+                datas.extend(data)
 
         # create merge excel csv file
-        df = pd.DataFrame(datas[0])
+        df = pd.DataFrame(datas)
         df.to_csv('resultfile/file/alldatafile/all data csv.csv', index=False)
         df.to_excel('resultfile/file/alldatafile/all data excel.xlsx', index=False)
 
         # create merge json file
         with open('resultfile/file/alldatafile/result_all_data_json.json', 'w') as outfile:
-            json.dump(datas[0], outfile)
+            json.dump(datas, outfile)
+
     else:
         print('please enter valid number for option number')
         return run()
