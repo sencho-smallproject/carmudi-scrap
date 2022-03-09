@@ -6,13 +6,13 @@ import pandas as pd
 import glob
 
 link = 'https://www.carmudi.co.id/mobil-dijual/indonesia?'
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36'}
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36'}
 
 
 def scrap(page):
     params = {
         'page_number': page,
-        'page_size': 25
+        'page_size': 50
     }
     req = requests.get(link, params=params, headers=headers)
 
@@ -46,7 +46,7 @@ def scrap(page):
         except Exception:
             price = 'Best Deal'
 
-        # menghindari error untuk gambar yang tidak memiliki src
+        # menghindari error untuk src selain gambar
         try:
             img = i.find('a', 'listing__overlay one-whole inline--block valign--top relative').find('img')['data-src']
         except Exception:
