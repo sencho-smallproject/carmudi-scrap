@@ -18,9 +18,6 @@ def scrap(page):
 
     data = []
 
-    soup = BeautifulSoup(req.text, 'html.parser')
-    mainsoup = soup.find_all('div', 'flex flex--row flex--wrap')
-
     # create folder for file
     try:
         os.mkdir('resultfile')
@@ -30,6 +27,9 @@ def scrap(page):
         os.mkdir('resultfile/file/excelcsv')
     except FileExistsError:
         pass
+
+    soup = BeautifulSoup(req.text, 'html.parser')
+    mainsoup = soup.find_all('div', 'flex flex--row flex--wrap')
 
     # scraping
     for i in mainsoup:
@@ -104,7 +104,7 @@ def run():
             if a > 0:
                 scrap(a)
             else:
-                print('frist page is one, please re enter your spesific page')
+                print('first page is one, please re enter your spesific page')
                 return run()
         except Exception:
             print('please enter a valid number for the page')
