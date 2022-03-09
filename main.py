@@ -33,26 +33,26 @@ def scrap(page):
 
     # scraping
     for i in mainsoup:
-        # akses link
+        # accsess link for full description
         links = i.find('a', 'ellipsize js-ellipsize-text')['href']
         reqtwo = requests.get(links)
         souptwo = BeautifulSoup(reqtwo.text, 'html.parser')
 
         title = i.find('a', 'ellipsize js-ellipsize-text').text.strip().replace('/', '')
 
-        # menghindari error untuk iklan yang tidak memiliki harga
+        # handling error for ads that have no price
         try:
             price = i.find('div', 'listing__price delta weight--bold').text
         except Exception:
             price = 'Best Deal'
 
-        # menghindari error untuk src selain gambar
+        # handling error for src other than image
         try:
             img = i.find('a', 'listing__overlay one-whole inline--block valign--top relative').find('img')['data-src']
         except Exception:
             pass
 
-        # menghindari error untuk deskripsi yang tidak tersedia
+        # handling error for unavailable description
         try:
             desc = souptwo.find('span', {'itemprop': 'description'}).text.replace('\n', ' ').replace('Tawaran Terbaik dari Carmudi.co.id ', '')
         except Exception:
